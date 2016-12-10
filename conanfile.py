@@ -17,8 +17,7 @@ class OpenEXRConan(ConanFile):
 
     def configure(self):
         self.options["IlmBase"].namespace_versioning = self.options.namespace_versioning
-        if not self.options.shared:
-            self.options["IlmBase"].shared = False
+        self.options["IlmBase"].shared = self.options.shared
 
     def source(self):
         tools.download("http://download.savannah.nongnu.org/releases/openexr/openexr-%s.tar.gz" % self.version,
@@ -62,19 +61,21 @@ file(COPY ${RUNTIME_FILES} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})""")
         self.copy("Imf*.h", dst="include/OpenEXR", src="openexr-%s/IlmImfUtil" % self.version, keep_path=False)
         self.copy("OpenEXRConfig.h", dst="include/OpenEXR", src="config", keep_path=False)
 
-        self.copy("IlmImf*.lib", dst="lib", src="lib", keep_path=False)
-        self.copy("IlmImf*.a", dst="lib", src="lib", keep_path=False)
-        self.copy("IlmImf*.so", dst="lib", src="lib", keep_path=False)
-        self.copy("IlmImf*.so.*", dst="lib", src="lib", keep_path=False)
-        self.copy("IlmImf*.dylib*", dst="lib", src="lib", keep_path=False)
+        self.copy("*IlmImf*.lib", dst="lib", src="lib", keep_path=False)
+        self.copy("*IlmImf*.a", dst="lib", src="lib", keep_path=False)
+        self.copy("*IlmImf*.so", dst="lib", src="lib", keep_path=False)
+        self.copy("*IlmImf*.so.*", dst="lib", src="lib", keep_path=False)
+        self.copy("*IlmImf*.dylib*", dst="lib", src="lib", keep_path=False)
 
-        self.copy("IlmImf*.dll", dst="bin", src="bin", keep_path=False)
+        self.copy("*IlmImf*.dll", dst="bin", src="bin", keep_path=False)
         self.copy("exr*", dst="bin", src="bin", keep_path=False)
 
     def package_info(self):
         parsed_version = self.version.split('.')
         version_suffix = "-%s_%s" % (parsed_version[0], parsed_version[1]) if self.options.namespace_versioning else ""
 
+        if self.options.shared and self.settings.os == "Windows":
+            self.cpp_info.defines.append("OPENEXR_DLL")
         self.cpp_info.bindirs = ["bin"]
         self.cpp_info.includedirs = ['include', 'include/OpenEXR']
         self.cpp_info.libs = ["IlmImf" + version_suffix, "IlmImfUtil" + version_suffix]
