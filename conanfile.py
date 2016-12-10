@@ -31,7 +31,7 @@ conan_basic_setup()
 set(ILMBASE_PACKAGE_PREFIX ${CONAN_ILMBASE_ROOT})
 file(GLOB RUNTIME_FILES ${CONAN_ILMBASE_ROOT}/bin/*.dll ${CONAN_ILMBASE_ROOT}/lib/*.dylib)
 file(COPY ${RUNTIME_FILES} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-message(${RUNTIME_FILES})""")
+message("${RUNTIME_FILES}")""")
 
         # Fixes for conan putting binaries in bin folder
         tools.replace_in_file("openexr-%s/IlmImf/CMakeLists.txt" % self.version,
