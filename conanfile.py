@@ -7,7 +7,7 @@ class OpenEXRConan(ConanFile):
     version = "2.2.0"
     license = "BSD"
     url = "https://github.com/Mikayex/conan-openexr.git"
-    requires = "IlmBase/2.2.0@Mikayex/stable"
+    requires = "IlmBase/2.2.0@Mikayex/stable", "zlib/1.2.8@lasote/stable"
     exports = "mingw-fix.patch"
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False], "namespace_versioning": [True, False]}
@@ -15,12 +15,10 @@ class OpenEXRConan(ConanFile):
     generators = "cmake"
     build_policy = "missing"
 
-    def requirements(self):
-        # zlib could be compiled in the shared lib if this is a static zlib
-        self.requires("zlib/1.2.8@lasote/stable", private=(self.options.shared and not self.options["zlib"].shared))
-
     def configure(self):
         self.options["IlmBase"].namespace_versioning = self.options.namespace_versioning
+        if not self.options.shared:
+            self.options["IlmBase"].shared = False
 
     def source(self):
         tools.download("http://download.savannah.nongnu.org/releases/openexr/openexr-%s.tar.gz" % self.version,
@@ -47,7 +45,7 @@ file(COPY ${RUNTIME_FILES} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})""")
         tools.replace_in_file("openexr-%s/CMakeLists.txt" % self.version, "ADD_SUBDIRECTORY ( IlmImfUtilTest )", "")
         tools.replace_in_file("openexr-%s/CMakeLists.txt" % self.version, "ADD_SUBDIRECTORY ( IlmImfFuzzTest )", "")
 
-        if self.settings.os == "Windows" and self.settings.compiler == "gcc": # MinGW compiler
+        if self.settings.os == "Windows" and self.settings.compiler == "gcc":  # MinGW compiler
             tools.patch(patch_file="mingw-fix.patch", base_path="openexr-%s" % self.version)
 
     def build(self):
