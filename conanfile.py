@@ -30,13 +30,17 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 set(ILMBASE_PACKAGE_PREFIX ${CONAN_ILMBASE_ROOT})
 file(GLOB RUNTIME_FILES ${CONAN_ILMBASE_ROOT}/bin/*.dll ${CONAN_ILMBASE_ROOT}/lib/*.dylib)
-file(COPY ${RUNTIME_FILES} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})""")
+file(COPY ${RUNTIME_FILES} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+message(${RUNTIME_FILES})""")
 
         # Fixes for conan putting binaries in bin folder
         tools.replace_in_file("openexr-%s/IlmImf/CMakeLists.txt" % self.version,
                               "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/b44ExpLogTable", "b44ExpLogTable")
         tools.replace_in_file("openexr-%s/IlmImf/CMakeLists.txt" % self.version,
                               "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/dwaLookups", "dwaLookups")
+        tools.replace_in_file("openexr-%s/IlmImf/CMakeLists.txt" % self.version, "ADD_EXECUTABLE ( dwaLookups",
+                              """file(COPY ${RUNTIME_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+ADD_EXECUTABLE ( dwaLookups""")
 
         # Remove tests compilation
         tools.replace_in_file("openexr-%s/CMakeLists.txt" % self.version, "ADD_SUBDIRECTORY ( IlmImfExamples )", "")
@@ -61,11 +65,11 @@ file(COPY ${RUNTIME_FILES} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})""")
         self.copy("Imf*.h", dst="include/OpenEXR", src="openexr-%s/IlmImfUtil" % self.version, keep_path=False)
         self.copy("OpenEXRConfig.h", dst="include/OpenEXR", src="config", keep_path=False)
 
-        self.copy("*IlmImf*.lib", dst="lib", src="lib", keep_path=False)
-        self.copy("*IlmImf*.a", dst="lib", src="lib", keep_path=False)
-        self.copy("*IlmImf*.so", dst="lib", src="lib", keep_path=False)
-        self.copy("*IlmImf*.so.*", dst="lib", src="lib", keep_path=False)
-        self.copy("*IlmImf*.dylib*", dst="lib", src="lib", keep_path=False)
+        self.copy("*IlmImf*.lib", dst="lib", src=".", keep_path=False)
+        self.copy("*IlmImf*.a", dst="lib", src=".", keep_path=False)
+        self.copy("*IlmImf*.so", dst="lib", src=".", keep_path=False)
+        self.copy("*IlmImf*.so.*", dst="lib", src=".", keep_path=False)
+        self.copy("*IlmImf*.dylib*", dst="lib", src=".", keep_path=False)
 
         self.copy("*IlmImf*.dll", dst="bin", src="bin", keep_path=False)
         self.copy("exr*", dst="bin", src="bin", keep_path=False)
