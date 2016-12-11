@@ -41,6 +41,10 @@ message("${RUNTIME_FILES}")""")
         tools.replace_in_file("openexr-%s/IlmImf/CMakeLists.txt" % self.version, "ADD_EXECUTABLE ( dwaLookups",
                               """file(COPY ${RUNTIME_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 ADD_EXECUTABLE ( dwaLookups""")
+        tools.replace_in_file("openexr-%s/IlmImf/CMakeLists.txt" % self.version,
+                              """  Iex${ILMBASE_LIBSUFFIX}
+  IlmThread${ILMBASE_LIBSUFFIX}""", """  IlmThread${ILMBASE_LIBSUFFIX}
+  Iex${ILMBASE_LIBSUFFIX}""")  # Fix wrong link order when using static IlmBase on gcc
 
         # Remove tests compilation
         tools.replace_in_file("openexr-%s/CMakeLists.txt" % self.version, "ADD_SUBDIRECTORY ( IlmImfExamples )", "")
