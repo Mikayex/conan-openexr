@@ -8,7 +8,7 @@ class OpenEXRConan(ConanFile):
     license = "BSD"
     url = "https://github.com/Mikayex/conan-openexr.git"
     requires = "IlmBase/2.2.0@Mikayex/stable", "zlib/1.2.8@lasote/stable"
-    exports = "mingw-fix.patch"
+    exports = "mingw-fix.patch", "FindOpenEXR.cmake"
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False], "namespace_versioning": [True, False]}
     default_options = "shared=True", "namespace_versioning=True"
@@ -76,6 +76,8 @@ ADD_EXECUTABLE ( dwaLookups""")
 
         self.copy("*IlmImf*.dll", dst="bin", src="bin", keep_path=False)
         self.copy("exr*", dst="bin", src="bin", keep_path=False)
+
+        self.copy("FindOpenEXR.cmake", src=".", dst=".")
 
     def package_info(self):
         parsed_version = self.version.split('.')
